@@ -27,7 +27,7 @@ public class SwaggerConfig {
 				.apis(RequestHandlerSelectors.basePackage("jukebox.assignment")).build().apiInfo(apiInfo());
 	}
 
-	/*@Bean
+	@Bean
 	public WebMvcConfigurer webMvcConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
@@ -37,7 +37,7 @@ public class SwaggerConfig {
 						.addResourceLocations("classpath:/META-INF/resources/webjars/");
 			}
 		};
-	}*/
+	}
 
 	private ApiInfo apiInfo() {
 		return new ApiInfo("REST API", "JukeBox Project", "", "",
