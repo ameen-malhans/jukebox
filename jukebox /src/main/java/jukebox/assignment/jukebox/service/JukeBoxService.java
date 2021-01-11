@@ -6,40 +6,52 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import jukebox.assignment.jukebox.controller.exceptions.model.RestTemplateException;
 import jukebox.assignment.jukebox.model.JukeBox;
 import jukebox.assignment.jukebox.model.Setting;
 import jukebox.assignment.jukebox.model.SettingWrapper;
+import jukebox.assignment.jukebox.service.constants.DownStreamAPI;
 
 @Service
 public class JukeBoxService {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(JukeBoxService.class);
+
 	@Autowired
 	private RestTemplate restTemplate;
 
-	public static final String GET_JUKES = "http://my-json-server.typicode.com/touchtunes/tech-assignment/jukes";
-	public static final String GET_SETTINGS = "http://my-json-server.typicode.com/touchtunes/tech-assignment/settings";
-
 	public List<JukeBox> getJukes() {
-
-		JukeBox[] result = restTemplate.getForObject(GET_JUKES, JukeBox[].class);
-
-		return Arrays.asList(result);
+		try {
+			JukeBox[] result = restTemplate.getForObject(DownStreamAPI.GET_JUKES.getUri(), JukeBox[].class);
+			return Arrays.asList(result);
+		} catch (RestClientException ex) {
+			LOGGER.error("Exception occured getJukes::", ex);
+			throw new RestTemplateException(DownStreamAPI.GET_JUKES, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+		}
 	}
 
 	public SettingWrapper getSettings() {
+		try {
+			ResponseEntity<SettingWrapper> result = restTemplate.getForEntity(DownStreamAPI.GET_SETTINGS.getUri(),
+					SettingWrapper.class);
+			return result.getBody();
+		} catch (RestClientException ex) {
+			LOGGER.error("Exception occured getJukes::", ex);
+			throw new RestTemplateException(DownStreamAPI.GET_SETTINGS, HttpStatus.INTERNAL_SERVER_ERROR,
+					ex.getMessage());
+		}
 
-		ResponseEntity<SettingWrapper> result = restTemplate.getForEntity(GET_SETTINGS, SettingWrapper.class);
-
-		return result.getBody();
 	}
 
-	
-	
 	public List<JukeBox> filterJukeBoxes(String settingId, String model, Integer offset, Integer limit) {
 		List<JukeBox> filteredJukes = new ArrayList<JukeBox>();
 
