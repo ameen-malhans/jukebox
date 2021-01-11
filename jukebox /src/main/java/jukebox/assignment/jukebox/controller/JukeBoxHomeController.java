@@ -21,8 +21,6 @@ public class JukeBoxHomeController {
 	
 	@GetMapping("/jukeboxes/{settingId}")
 	public List<JukeBox> getJukeboxes(@PathVariable(value= "settingId") String settingId,@RequestParam(value= "model",required=false) String model,@RequestParam(value= "offset",required=false,defaultValue = "0") Integer offset,@RequestParam(value= "limit",required=false) Integer limit) {
-		
-		
 		return jukeBoxService.filterJukeBoxes(settingId, model, offset, limit);
 	}
 	
